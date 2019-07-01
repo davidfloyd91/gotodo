@@ -8,6 +8,7 @@ import (
     "net/http"
     "github.com/gorilla/mux"
     _ "github.com/lib/pq"
+    "github.com/rs/cors"
 )
 
 var db *sql.DB
@@ -46,8 +47,15 @@ func initRouter() {
     // $ curl -X DELETE http://localhost:8000/todos/8/delete/ -v
     router.HandleFunc("/todos/{id}/delete/", DeleteTodo).Methods("DELETE")
 
+    c := cors.New(cors.Options{
+        AllowedOrigins: []string{"*"},
+        AllowCredentials: true,
+    })
+
+    handler := c.Handler(router)
+
     // start server
-    log.Fatal(http.ListenAndServe(":8000", router))
+    log.Fatal(http.ListenAndServe(":8000", handler))
 }
 
 /*** home ***/
